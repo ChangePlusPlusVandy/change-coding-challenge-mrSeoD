@@ -18,25 +18,28 @@ def main():
     elon_tweets = []
     kanye_tweets = []
 
+    # authentication keys and secrets
     auth = OAuth1(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
-    #introductory texts are written
+    # introductory texts are written for the game to begin
     introduction()
 
-    #set up both elon_tweets and kanye_tweets arrays
+    # set up both elon_tweets and kanye_tweets arrays
     setup_tweets(elon_tweets, kanye_tweets, auth)
  
-    #main game playing method
+    # main game playing method
     num_guess, num_success = play_game(elon_tweets, kanye_tweets, num_guess, num_success)
 
-    #stats for the user
+    # stats for the user
     game_result(num_guess, num_success)
 
+# introduction() method gives information and instructions for the game
 def introduction():
     print("Welcome to the game \"Guess Whose tweet this is? Technology giant Elon Musk? OR Music giant Kanye West?")
     print("You will be prompted with randomly selected tweet from either of the persons and you are to guess which one wrote that tweet!")
     print("__________________________\n")
 
+# setup_tweets() method sets up the tweet of each Elon's and Kanye's tweets that don't contain URL or tag
 def setup_tweets(elon_tweets, kanye_tweets, auth):
     counter = 0
     index = 0
@@ -47,73 +50,80 @@ def setup_tweets(elon_tweets, kanye_tweets, auth):
 
     #putting the tweets into the list in that does not have a tag or link
     while counter < MAX_TWEET:
-        if index < len(elon_data):
+        if (index < len(elon_data)):
+            # get the text part of the tweet in .json file
             elon_tweet = elon_data[index]["text"]
-            if elon_tweet.find("http") == -1 and elon_tweet.find("@") == -1:
+            # check if there is any URL or tag in the text
+            if (elon_tweet.find("http") == -1 and elon_tweet.find("@") == -1):
                 elon_tweets.append(elon_tweet)
 
-        if index < len(kanye_data):
+        if (index < len(kanye_data)):
             kanye_tweet = kanye_data[index]["text"]
-            if kanye_tweet.find("http") == -1 and elon_tweet.find("@") == -1:
+            if (kanye_tweet.find("http") == -1 and elon_tweet.find("@") == -1):
                 kanye_tweets.append(kanye_tweet)
         
         counter += 1
         index += 1
 
+# play_game() method controls the game by getting user's input and replaying until the user wants to quit
 def play_game(elon_tweets, kanye_tweets, num_guess, num_success):
+    # dumby character assigned to start the game in the beginning
     gameStatus = 'A'
 
     while(gameStatus != 'N'):
-        # 0 = elon and 1 = kanye
+        # getting random number between 0 or 1 --> Elon == 0 // Kanye == 1
         elonOrKanye = random.randint(0, 1)
         
         if(elonOrKanye == 0):
-            user_guessed(elon_tweets, elonOrKanye, num_guess, num_success)
+            num_guess, num_success = user_guessed(elon_tweets, elonOrKanye, num_guess, num_success)
 
         elif(elonOrKanye == 1):
-            user_guessed(kanye_tweets, elonOrKanye, num_guess, num_success)
+            num_guess, num_success = user_guessed(kanye_tweets, elonOrKanye, num_guess, num_success)
             
-        #ask for continuing the game
+        # ask for continuing the game
         print("__________________________\n")
-        playAgain = input("Would you like to play again? (Y/N) ")
+        play_again = input("Would you like to play again? (Y/N) ")
         
-        while((len(playAgain) != 1) and (playAgain.lower() != 'y' or playAgain.lower() != 'n')):
-            playAgain = input("Please input alphabet 'y' or 'n' to continue or not! ")
-        if(playAgain.upper() == "N"):
+        while((len(play_again) != 1) or (play_again.lower() != 'y' and play_again.lower() != 'n')):
+            play_again = input("Please input alphabet 'Y' or 'N' to continue or not! ")
+        if(play_again.upper() == "N"):
             gameStatus = 'N'
     
-
     return num_guess, num_success;
 
+# user_guessed() method manages the user's input to tell if the user got right or not
 def user_guessed(array_of_tweets, which_persons_tweet, num_guess, num_success):
     randomElement = random.randint(0, len(array_of_tweets) - 1)
-    guess = input("Whose tweet is this? (Press 'e' for Elon and 'k' for Kanye): " + "\"" + array_of_tweets[randomElement] + "\" ")
+    guess = input("Whose tweet is this? (Press 'E' for Elon and 'K' for Kanye): \n" + "\"" + array_of_tweets[randomElement] + "\" Your Answer: ")
     if(which_persons_tweet == 0):
-        while((len(guess) != 1) and (guess.lower() != 'e' or guess.lower() != 'k')):
-            guess = input("Please input alphabet 'e' or 'k' for the answer! ")
-            
-        if(guess.lower() == 'e'):
+        while((len(guess) != 1) or (guess.upper() != 'E' and guess.upper() != 'K')):
+            guess = input("Please input alphabet 'E' or 'K' for the answer! ")
+
+        if(guess.upper() == 'E'):
             num_guess += 1
             num_success += 1
             print("Great job! You got it right!")
 
-        elif(guess.lower() == 'k'):
+        elif(guess.upper() == 'K'):
             num_guess += 1
             print("It was actually Elon's tweet! :(")
+            
     elif(which_persons_tweet == 1):
-        while((len(guess) != 1) and (guess.lower() != 'e' or guess.lower() != 'k')):
-            guess = input("Please input alphabet 'e' or 'k' for the answer! ")
+        while((len(guess) != 1) and (guess.upper() != 'E' and guess.upper() != 'K')):
+            guess = input("Please input alphabet 'E' or 'K' for the answer! ")
                           
-        if(guess.lower() == 'k'):
+        if(guess.upper() == 'K'):
             num_guess += 1
             num_success += 1
             print("Great job! You got it right!")
 
-        elif(guess.lower() == 'e'):
+        elif(guess.upper() == 'E'):
             num_guess += 1
             print("It was actually Kanye's tweet! :(")
-    
+            
+    return num_guess, num_success
 
+# game_result() method returns the stats of the game with success rate
 def game_result(num_guess, num_success):
     percentage = round((num_success/num_guess * 100), 2)
     print("____________________")

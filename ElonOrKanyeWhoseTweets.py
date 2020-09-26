@@ -41,15 +41,13 @@ def introduction():
 
 # setup_tweets() method sets up the tweet of each Elon's and Kanye's tweets that don't contain URL or tag
 def setup_tweets(elon_tweets, kanye_tweets, auth):
-    counter = 0
     index = 0
 
-    #MAKE SURE TO CHANGE THE COUNT TO 3200!!!!!!!!!!!
-    kanye_data = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=kanyewest&count=200', auth=auth).json()
-    elon_data = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=elonmusk&count=200', auth=auth).json()
+    kanye_data = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=kanyewest&count=3200', auth=auth).json()
+    elon_data = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=elonmusk&count=3200', auth=auth).json()
 
-    #putting the tweets into the list in that does not have a tag or link
-    while counter < MAX_TWEET:
+    # putting the tweets into the list in that does not have a tag or link
+    while (index < MAX_TWEET):
         if (index < len(elon_data)):
             # get the text part of the tweet in .json file
             elon_tweet = elon_data[index]["text"]
@@ -62,7 +60,6 @@ def setup_tweets(elon_tweets, kanye_tweets, auth):
             if (kanye_tweet.find("http") == -1 and elon_tweet.find("@") == -1):
                 kanye_tweets.append(kanye_tweet)
         
-        counter += 1
         index += 1
 
 # play_game() method controls the game by getting user's input and replaying until the user wants to quit
